@@ -27,6 +27,22 @@ After analyzing the issues we will draft a guideline for the optimal solution an
 - Here is the important bit. The <i>Solution</i> is able to locally classify the image, understanding if it has ever seen a given object (i.e. with no prior knowledge, aka zero-shot concept) or classify it even if it has previously seen just one or few examples (aka one-shot or few-shots concept). Plus the classification is at pixel level (like a segmentation). Furthermore the classification training is extremely fast and efficient, the consequent downtime is minimal.
 - The production flow can go on, the anomalies can be detected as such or classified if the operator needs it. Moreover, if the operator feels that the classification is incorrect, imperfect or need to be more robust, he can always increase the <i>Solution</i> knowledge with the same point and trace method as above.
 
+```mermaid
+flowchart LR;
+  A(["AD training<br>(supplier)"])
+  A-->B["Validation<br>(supplier)"];
+  B-->C{"Anomalies detected<br>correctly<br>(supplier)"};
+  C-->|Yes|D(["<strong>Release</strong>"])
+  C-->|No|E["AC addition<br>(supplier)"]
+  E-->B
+  D-->F["Runtime<br>(customer)"];
+  F-->G{"Anomalies detected<br>correctly<br>(customer)"}
+  G-->|Yes|F
+  G-->|No|H["AC addition<br>(supplier)"]
+  H-->F
+  G-.->|Global retrain<br>needed|A
+```
+
 ### Why it's cool
 The <i>Solution</i> introduces an innovative merge of AI concepts to push forward the boundaries of anomaly detection in industrial environments.
 - It efficiently implements anomaly detection, only good samples are needed and with a certain amount of robustness to noise. I.e. only good samples randomly picked up from the production line are needed, meaning minimal data collection effort and no labeling costs.
@@ -93,7 +109,7 @@ New samples of different defect are correctly detected plus the background is co
 <p align="center">
   <div align="center"><img src="./images/04a-bad_roi.png" width="300" alt="AC sample ROI">
   <img src="./images/04b-bad_oneclass.png" width="800" alt="AC bad sample oneclass"></div>
-  <div align="center"><i>Fig. 4a-b: collected a sub-sample of the textile backgroud, this is correctly classificated and localized</i></div>
+  <div align="center"><i>Fig. 4a-b: collected a sub-sample of the textile backgroud, this is correctly classificated and localized. In 4a the three sections are: sample with anomaly map overlapped, classification map, classification error map</i></div>
 </p>
 Now it’s the turn of the button, the background is detected but for the <i>Solution</i> the button is a novelty, thus an anomaly. Use the pointer to outline the button, Now new samples of the same button are correctly segmented while anomalies are still detected like that. If necessary we can use new button samples of the same kind to make the <i>Solution</i> more robust.
 <p align="center">
@@ -121,17 +137,19 @@ Now just close the circle, make the <i>Solution</i> classify all the defects. It
 <p align="center">
   <div align="center"><img src="./images/07e-colorbar.png" width="120" alt="AC colorbar">
   <img src="./images/07a-defect1.png" width="800" alt="AC defect 1"></div>
-  <div align="center"><i>Fig. 7a-b: the classification colorbar and a "string" defect</i></div>
+  <div align="center"><i>Fig. 7a-b: the classification colorbar and a "string" defect after five-shots</i></div>
   <div align="center"><img src="./images/07b-defect7.png" width="800" alt="AC defect 2"></div>
-  <div align="center"><i>Fig. 7c: a "line" defect</i></div>
+  <div align="center"><i>Fig. 7c: a "line" defect after five-shots</i></div>
   <div align="center"><img src="./images/07c-defect3.png" width="800" alt="AC defect 3"></div>
-  <div align="center"><i>Fig. 7d: a "fleck" defect</i></div>
+  <div align="center"><i>Fig. 7d: a "fleck" defect after five-shots</i></div>
   <div align="center"><img src="./images/07d-defect4.png" width="800" alt="AC defect 4"></div>
-  <div align="center"><i>Fig. 7e: a "contamination" defect</i></div>
+  <div align="center"><i>Fig. 7e: a "contamination" defect after five-shots</i></div>
 </p>
 <imaege of defects>
 And go on. We never left or stop the production.
 
 
-### Acknowlwdgements:
+### Acknowledgements:
 - WFDD is a dataset for benchmarking anomaly detection methods with a focus on textile inspection. It includes 4101 woven fabric images categorized into 4 categories: grey cloth, grid cloth, yellow cloth, and pink flower. The first three classes are collected from the industrial production sites of WEIQIAO Textile, while the 'pink flower' class is gathered from the publicly available Cloth Flaw Dataset. Each category contains block-shape, point-like, and line-type defects with pixel-level annotations. [Download here](https://drive.google.com/file/d/1P8yfNnfoFsb0Lv-HRzkPQ2nD9qsL--Vk/view)
+- The solution code is [here](https://github.com/leonardopadovan/oneshot_anomaly_classification_and_localization).
+- The content and intellectual and technical concepts of this document and the code mentioned above are exclusive property of Leonardo Padovan. Reproduction of this material is strictly forbidden unless prior written permission is obtained.
